@@ -72,6 +72,7 @@ tb_cor_genero as (
 tb_taxas as(
     select SG_PARTIDO,
         SG_UF,
+
         sum(fem) as totalfem,
         count(*) totalcandidatos,
         sum(fem) / (1.0 * count(*)) as txfem,
@@ -217,11 +218,60 @@ tb_infos as (select SG_PARTIDO,
     sum(case when SG_UF = 'SC' then totalPretos else 0 end) as totalPretosSC,
     sum(case when SG_UF = 'SE' then totalPretos else 0 end) as totalPretosSE,
     sum(case when SG_UF = 'SP' then totalPretos else 0 end) as totalPretosSP,
-    sum(case when SG_UF = 'TO' then totalPretos else 0 end) as totalPretosTO
+    sum(case when SG_UF = 'TO' then totalPretos else 0 end) as totalPretosTO,
+
+    -- Numeros totais de Candidatos
+    sum(totalcandidatos) as totalcandidatosBR,
+    sum(case when SG_UF = 'AC' then totalcandidatos else 0 end) as totalcandidatosAC,
+    sum(case when SG_UF = 'AL' then totalcandidatos else 0 end) as totalcandidatosAL,
+    sum(case when SG_UF = 'AM' then totalcandidatos else 0 end) as totalcandidatosAM,
+    sum(case when SG_UF = 'AP' then totalcandidatos else 0 end) as totalcandidatosAP,
+    sum(case when SG_UF = 'BA' then totalcandidatos else 0 end) as totalcandidatosBA,
+    sum(case when SG_UF = 'CE' then totalcandidatos else 0 end) as totalcandidatosCE,
+    sum(case when SG_UF = 'ES' then totalcandidatos else 0 end) as totalcandidatosES,
+    sum(case when SG_UF = 'GO' then totalcandidatos else 0 end) as totalcandidatosGO,
+    sum(case when SG_UF = 'MA' then totalcandidatos else 0 end) as totalcandidatosMA,
+    sum(case when SG_UF = 'MG' then totalcandidatos else 0 end) as totalcandidatosMG,
+    sum(case when SG_UF = 'MS' then totalcandidatos else 0 end) as totalcandidatosMS,
+    sum(case when SG_UF = 'MT' then totalcandidatos else 0 end) as totalcandidatosMT,
+    sum(case when SG_UF = 'PA' then totalcandidatos else 0 end) as totalcandidatosPA,
+    sum(case when SG_UF = 'PB' then totalcandidatos else 0 end) as totalcandidatosPB,
+    sum(case when SG_UF = 'PE' then totalcandidatos else 0 end) as totalcandidatosPE,
+    sum(case when SG_UF = 'PI' then totalcandidatos else 0 end) as totalcandidatosPI,
+    sum(case when SG_UF = 'PR' then totalcandidatos else 0 end) as totalcandidatosPR,
+    sum(case when SG_UF = 'RJ' then totalcandidatos else 0 end) as totalcandidatosRJ,
+    sum(case when SG_UF = 'RN' then totalcandidatos else 0 end) as totalcandidatosRN,
+    sum(case when SG_UF = 'RO' then totalcandidatos else 0 end) as totalcandidatosRO,
+    sum(case when SG_UF = 'RR' then totalcandidatos else 0 end) as totalcandidatosRR,
+    sum(case when SG_UF = 'RS' then totalcandidatos else 0 end) as totalcandidatosRS,
+    sum(case when SG_UF = 'SC' then totalcandidatos else 0 end) as totalcandidatosSC,
+    sum(case when SG_UF = 'SE' then totalcandidatos else 0 end) as totalcandidatosSE,
+    sum(case when SG_UF = 'SP' then totalcandidatos else 0 end) as totalcandidatosSP,
+    sum(case when SG_UF = 'TO' then totalcandidatos else 0 end) as totalcandidatosTO
 
 from tb_taxas
-group by 1)
+group by 1),
 
 
-select *
-from tb_infos
+tb_taxas_br as (select SG_PARTIDO,
+        'BR' as SG_UF,
+        sum(fem) as totalfem,
+
+        count(*) totalcandidatos,
+        sum(fem) / (1.0 * count(*)) as txfem,
+
+        sum(cor_PRETA) as totalPretos,
+        sum(cor_PRETA) / (1.0 * count(*)) as txPretos
+    
+from tb_cor_genero
+group by 1),
+
+tb_taxas_geral as (
+
+    select * from tb_taxas
+    union ALL
+    select * from tb_taxas_br
+)
+
+select * from tb_taxas_geral
+

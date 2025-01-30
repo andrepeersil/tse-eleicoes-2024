@@ -7,7 +7,7 @@ import os
 #%%
 
 current_dir = os.path.dirname(__file__)
-file_path = os.path.join(current_dir, 'queries.sql')
+file_path = os.path.join(current_dir, 'partidos_por_uf.sql')
 
 with open(file_path, 'r', encoding='utf-8') as open_file:
     query = open_file.read()
@@ -19,21 +19,17 @@ engine = sqlalchemy.create_engine('sqlite:///../data/database.db')
 df = pd.read_sql_query(query, engine )
 
 #%%
-df_graf = df[['SG_PARTIDO', 'txfemBR', 'txPretosBR' ]]
+df_graf = df[['SG_PARTIDO', 'txfemBR', 'txPretosBR', 'totalcandidatosBR']]
 # df_graf = df_graf.set_index('SG_PARTIDO')
-#%%
-import streamlit as st
 
 #%%
 import matplotlib
 matplotlib.use('Qt5Agg')
 import matplotlib.pyplot as plt
 import seaborn as sns
-
-#%%
-df_graf
 #%%
 from adjustText import adjust_text
+
 #%%
 
 ymedio = df_graf['txPretosBR'].mean()
@@ -45,9 +41,17 @@ xmin = df_graf['txfemBR'].min()
 ymax = df_graf['txPretosBR'].max()
 xmax = df_graf['txfemBR'].max()
 
+#%%
+from sklearn.cluster import KMeans
+
+
+X = df_graf[['txfemBR', 'txPretosBR']]
+
+kmeans = KMeans(n_clusters=6, random_state=0, n_init="auto")
+kmeans.fit(X)
+kmeans.labels_
 
 #%%
-
 plt.figure(figsize=(15, 8),dpi=120)
 
 sns.scatterplot(
@@ -55,10 +59,13 @@ sns.scatterplot(
     x='txfemBR', 
     y='txPretosBR',
     
-    size="SG_PARTIDO",
+    size='totalcandidatosBR',
     legend=False,
-    sizes=(5, 200)
+    sizes=(5, 200),
     
+    hue = kmeans.labels_,
+    palette = 'Set2',
+    alpha = .6,
     )
 
 nomes_partidos = df_graf['SG_PARTIDO'].to_list()
@@ -86,10 +93,8 @@ plt.legend()
 
 plt.grid(True)
 
-plt.savefig('../img/grafico_mulherxpretos_v2.png',format='png')
+plt.savefig('../img/grafico_mulherxpretos_v3.png',format='png')
 
 plt.show()
 
 #%%
-
-
