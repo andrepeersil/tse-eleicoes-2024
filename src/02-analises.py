@@ -48,7 +48,7 @@ xmax = df_graf['txfemBR'].max()
 
 #%%
 
-plt.figure(figsize=(6, 4),dpi=100)
+plt.figure(figsize=(15, 8),dpi=120)
 
 sns.scatterplot(
     data=df_graf, 
@@ -73,15 +73,20 @@ plt.title("Eleições Municipais - 2024 - Brasil", fontsize=12)
 plt.xlabel("Candidaturas de Mulheres", fontsize=10) 
 plt.ylabel("Candidaturas de Pessoas Pretas", fontsize=10) 
 
-plt.hlines(y=ymedio,xmin=xmin, xmax=xmax, linestyles='--', colors='green', label=f"Média Mulheres: {round(100*ymedio,0)}%")
-plt.vlines(x=xmedio, ymin=ymin, ymax=ymax, linestyles='--', colors='orange',label=  f"Média Pessoas Pretas: {round(100* xmedio,0)}%")
+plt.hlines(y=ymedio,xmin=xmin, xmax=xmax, linestyles='--', colors='green', label=f"Média Pessoas Prestas: {round(100*ymedio,0)}%")
+plt.vlines(x=xmedio, ymin=ymin, ymax=ymax, linestyles='--', colors='orange',label=  f"Média Mulheres: {round(100* xmedio,0)}%")
 
 plt.legend() 
 
 plt.grid(True)
+
+plt.savefig('../img/distribuicao.png',format='png')
+
 plt.show()
 
 
-# plt.savefig('../img/distribuicao.png' )
+
+
 #%%
+
 
