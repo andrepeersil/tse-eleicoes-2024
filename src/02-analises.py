@@ -53,7 +53,13 @@ plt.figure(figsize=(15, 8),dpi=120)
 sns.scatterplot(
     data=df_graf, 
     x='txfemBR', 
-    y='txPretosBR')
+    y='txPretosBR',
+    
+    size="SG_PARTIDO",
+    legend=False,
+    sizes=(5, 200)
+    
+    )
 
 nomes_partidos = df_graf['SG_PARTIDO'].to_list()
 x = df_graf['txfemBR'].to_list()
@@ -73,19 +79,16 @@ plt.title("Eleições Municipais - 2024 - Brasil", fontsize=12)
 plt.xlabel("Candidaturas de Mulheres", fontsize=10) 
 plt.ylabel("Candidaturas de Pessoas Pretas", fontsize=10) 
 
-plt.hlines(y=ymedio,xmin=xmin, xmax=xmax, linestyles='--', colors='green', label=f"Média Pessoas Prestas: {round(100*ymedio,0)}%")
-plt.vlines(x=xmedio, ymin=ymin, ymax=ymax, linestyles='--', colors='orange',label=  f"Média Mulheres: {round(100* xmedio,0)}%")
+plt.hlines(y=ymedio,xmin=xmin, xmax=xmax, linestyles='--', colors='green', label=f"Média Pessoas Pretas: {round(100*ymedio,1)}%")
+plt.vlines(x=xmedio, ymin=ymin, ymax=ymax, linestyles='--', colors='orange',label=  f"Média Mulheres: {round(100* xmedio,1)}%")
 
 plt.legend() 
 
 plt.grid(True)
 
-plt.savefig('../img/distribuicao.png',format='png')
+plt.savefig('../img/grafico_mulherxpretos_v2.png',format='png')
 
 plt.show()
-
-
-
 
 #%%
 
