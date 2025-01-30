@@ -1,4 +1,8 @@
+#%%
 import chardet
+
+#%%
+
 
 with open('queries.sql', 'rb') as file:
     raw_data = file.read()
