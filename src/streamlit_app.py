@@ -15,17 +15,16 @@ from sklearn.cluster import KMeans
 
 #%% 
 
-FILE_PATH_LOCAL="../data/query_categorias.parquet"
-FILE_PATH_CLOUD="../../data/query_categorias.parquet"
+app_path = os.path.dirname(os.path.abspath(__file__))
+src_path = os.path.dirname(app_path)
+base_path = os.path.dirname(src_path)
+data_path = os.path.join(src_path, "data")
 
-if "mount" in os.getcwd():
-    FILE_PATH = FILE_PATH_CLOUD
-else:
-    FILE_PATH = FILE_PATH_LOCAL
+filmename = os.path.join(data_path, 'query_categorias.parquet')
 
 @st.cache_data(ttl=60*60*24)
 def carregar_dados():
-    df = pd.read_parquet(FILE_PATH)
+    df = pd.read_parquet(filmename)
     return df
 
 df = carregar_dados()
