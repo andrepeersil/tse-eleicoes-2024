@@ -2,9 +2,13 @@
 
 ### Eleições Municipais 2024
 
-Esse repósitório visa estudar algumas ferramentas de análise de dados se utilziando dos dados abertos dos candidatos das eleições de 2024.
+Esse repósitório visa estudar algumas ferramentas de análise de dados se utilziando dos dados abertos dos candidatos das eleições de 2024. Passando pela criação de um Data App.
 
+[Acessar Data App](https://candidaturas-br-2024.streamlit.app/)
 [Fonte: Dados Abertos TSE](https://dadosabertos.tse.jus.br/dataset/candidatos-2024)
+
+Realizado com material de apoio das Lives do Téo me Why.
+[Link das Lives](https://www.twitch.tv/collections/hPL8gBlV7xc2BA)
 
 #### Aqui utilizo:
 * SQL (Sqlite)
@@ -20,3 +24,5 @@ O tamanho da bolha representa a escala das quantidades de candidaturas do partid
 ![<alt-text>](<https://raw.githubusercontent.com/andrepeersil/tse-eleicoes-2024/refs/heads/main/img/grafico_mulherxpretos_v2.png>)
 
 Após isso foi iniciado a criação de um Data App com Streamlit, tornando os gráficos dinâmicos, sendo possível ativar e desativar as bolhas, alterar o valor da clusterização e também filtrar por estado.
+
+
