@@ -1,19 +1,14 @@
-#%%
-
 import pandas as pd
 import os
 import streamlit as st
 from pathlib import Path
-
 import matplotlib
 matplotlib.use('Qt5Agg')
 import matplotlib.pyplot as plt
 import seaborn as sns
 from adjustText import adjust_text
-#%%
 from sklearn.cluster import KMeans
-
-#%% 
+ 
 
 app_path = os.path.dirname(os.path.abspath(__file__))
 src_path = os.path.dirname(app_path)
@@ -28,11 +23,9 @@ def carregar_dados():
     return df
 
 df = carregar_dados()
-#%%
 
 ufs = df[['SG_UF']].drop_duplicates()
 
-#%%
 st.title('TSE Analytics')
 
 def about():
@@ -82,7 +75,6 @@ fig = plt.figure(figsize=(6, 6),dpi=100)
 
 if bolhas:
     bolhas = 'totalcandidatos'
-#%%
 
 if cluster:
     X = df_select[['txfem', 'txPretos']]
@@ -93,7 +85,6 @@ if cluster:
 else:
     cluster = None
 
-#%%
 sns.scatterplot(
     data=df_select, 
     x='txfem', 
