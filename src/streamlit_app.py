@@ -1,7 +1,7 @@
 #%%
+
 import pandas as pd
 import sqlalchemy
-import os
 import streamlit as st
 
 import matplotlib
@@ -14,34 +14,38 @@ from sklearn.cluster import KMeans
 
 #%%
 
-current_dir = os.path.dirname(__file__)
-file_path = os.path.join(current_dir, 'query_categorias.sql')
+# current_dir = os.path.dirname(__file__)
+# file_path = os.path.join(current_dir, 'query_categorias.sql')
 
-with open(file_path, 'r', encoding='utf-8') as open_file:
-    query = open_file.read()
+# with open(file_path, 'r', encoding='utf-8') as open_file:
+#     query = open_file.read()
 
-engine = sqlalchemy.create_engine('sqlite:///../data/database.db')
+# engine = sqlalchemy.create_engine('sqlite:///../data/database.db')
 #%% 
-df = pd.read_sql_query(query, engine)
+
+# df = pd.read_sql_query(query, engine)
+df = pd.read_parquet('query_categorias.parquet')
+
 #%%
 
 ufs = df[['SG_UF']].drop_duplicates()
 
 #%%
 st.title('TSE Analytics')
-st.markdown('''Esse repósitório visa estudar 
-            algumas ferramentas de análise de 
-            dados se utilziando dos dados abertos dos 
-            candidatos das eleições de 2024. 
-            ''')
 
-st.markdown('[Dados Abertos TSE](https://dadosabertos.tse.jus.br/dataset/candidatos-2024)')
-st.markdown('[Repositório GitHub](https://github.com/andrepeersil/tse-eleicoes-2024)')
+def about():
 
-st.markdown('Realizado com material de apoio das Lives do Téo me Why.')
-st.markdown('[Link das Lives](https://www.twitch.tv/collections/hPL8gBlV7xc2BA)')
+    st.markdown('''Esse repósitório visa estudar 
+                algumas ferramentas de análise de 
+                dados se utilziando dos dados abertos dos 
+                candidatos das eleições de 2024. 
+                ''')
 
-            
+    st.markdown('[Dados Abertos TSE](https://dadosabertos.tse.jus.br/dataset/candidatos-2024)')
+    st.markdown('[Repositório GitHub](https://github.com/andrepeersil/tse-eleicoes-2024)')
+
+    st.markdown('Realizado com material de apoio das Lives do Téo me Why.')
+    st.markdown('[Link das Lives](https://www.twitch.tv/collections/hPL8gBlV7xc2BA)')
 
 with st.sidebar:
     uf = st.selectbox(
@@ -58,6 +62,8 @@ with st.sidebar:
 with st.sidebar:
     n_clusters = st.slider("Quantos clusters?", 1, 8)
 
+with st.sidebar:
+    about()
 
 df_select = df[df['SG_UF']==uf]
 
@@ -92,7 +98,7 @@ sns.scatterplot(
     y='txPretos',
     
     size=bolhas,
-    alpha = .6,
+    alpha = .5,
 
     legend=False,
     sizes=(20, 200),
@@ -109,7 +115,7 @@ y = df_select['txPretos'].to_list()
 
 texts = [plt.text(x[i], y[i], nomes_partidos[i], fontsize=10) for i in range(len(x))]
 adjust_text(texts,
-        arrowprops=dict(arrowstyle='->', color='red')
+        arrowprops=dict(arrowstyle='->', color='red',alpha=.5)
         );
 
 plt.suptitle("Candidaturas de Mulheres x Candidaturas de Pessoas Pretas", fontsize=14) 

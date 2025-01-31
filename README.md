@@ -1,4 +1,4 @@
-# Análise dos Dados Abetos TSE
+# Análise dos Dados Abertos TSE
 
 ### Eleições Municipais 2024
 
@@ -8,7 +8,7 @@ Esse repósitório visa estudar algumas ferramentas de análise de dados se util
 
 #### Aqui utilizo:
 * SQL (Sqlite)
-* Python (Pandas, Matplolib,Seaboarn, SqlAlchemy)
+* Python (Pandas, Sklearn, Matplolib,Seaboarn, SqlAlchemy)
 * Streamlit 
 
 Inicialmente realizamos a ingestão dos dados, que são organizados em tabelas SQL e algumas dados são selecionados, principalmente dados relacionados a diversidade dos partidos em cada estado brasileiro.
