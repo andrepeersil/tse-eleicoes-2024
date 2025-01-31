@@ -1,9 +1,6 @@
 import pandas as pd
 import os
 import streamlit as st
-from pathlib import Path
-import matplotlib
-matplotlib.use('Qt5Agg')
 import matplotlib.pyplot as plt
 import seaborn as sns
 from adjustText import adjust_text
