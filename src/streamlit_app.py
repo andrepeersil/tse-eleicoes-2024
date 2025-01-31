@@ -22,6 +22,7 @@ def carregar_dados():
 df = carregar_dados()
 
 ufs = df[['SG_UF']].drop_duplicates()
+cargos = df[['DS_OCUPACAO']].drop_duplicates()
 
 st.title('TSE Analytics')
 
@@ -36,13 +37,17 @@ def about():
     st.markdown('[Dados Abertos TSE](https://dadosabertos.tse.jus.br/dataset/candidatos-2024)')
     st.markdown('[Repositório GitHub](https://github.com/andrepeersil/tse-eleicoes-2024)')
 
-    st.markdown('Realizado com material de apoio das Lives do Téo me Why.')
-    st.markdown('[Link das Lives](https://www.twitch.tv/collections/hPL8gBlV7xc2BA)')
 
 with st.sidebar:
     uf = st.selectbox(
         "Escolha um estado:",
         (ufs),
+    )
+
+with st.sidebar:
+    cargo = st.selectbox(
+        "Escolha um cargo:",
+        (cargos),
     )
 
 with st.sidebar:
@@ -57,7 +62,7 @@ with st.sidebar:
 with st.sidebar:
     about()
 
-df_select = df[df['SG_UF']==uf]
+df_select = df[df['SG_UF']==uf and df['DS_OCUPACAO']==cargo]
 
 ymedio = df_select['txPretos'].mean()
 xmedio = df_select['txfem'].mean()
