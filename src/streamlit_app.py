@@ -22,9 +22,11 @@ def carregar_dados():
 df = carregar_dados()
 
 ufs = df[['SG_UF']].drop_duplicates()
+cargos = df[['DS_CARGO']].drop_duplicates()
+cargos.loc[3] = 'TODOS'
 
 st.title('TSE Analytics')
-
+# st.write(cargos['DS_CARGO'].to_list())
 def about():
 
     st.markdown('''Esse repósitório visa estudar 
@@ -41,23 +43,35 @@ def about():
 
 with st.sidebar:
     uf = st.selectbox(
-        "Escolha um estado:",
+        "Estado:",
         (ufs),
     )
 
 with st.sidebar:
-    bolhas = st.checkbox("Ativar Bolhas(Total Candidatos")
+    cargo = st.selectbox(
+        "Cargo:",
+        (cargos),
+    )
 
 with st.sidebar:
-    cluster = st.checkbox("Ativar Clusterização")
+    bolhas = st.checkbox("Bolhas(Total Cand.)")
 
 with st.sidebar:
-    n_clusters = st.slider("Quantos clusters?", 1, 8)
+    cluster = st.checkbox("Clusterização")
+
+with st.sidebar:
+    n_clusters = st.slider("Num clusters?", 1, 8)
 
 with st.sidebar:
     about()
 
-df_select = df[df['SG_UF']==uf]
+if cargo == 'TODOS':
+    df_select = df[(df['SG_UF']==uf) & (df['DS_CARGO'].isin(cargos['DS_CARGO'].to_list()))]
+else:
+    df_select = df[(df['SG_UF']==uf) & (df['DS_CARGO']==cargo)]
+
+
+st.write(f"Total candidatos: {df_select['totalcandidatos'].sum()}")
 
 ymedio = df_select['txPretos'].mean()
 xmedio = df_select['txfem'].mean()
