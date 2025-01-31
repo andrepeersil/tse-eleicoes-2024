@@ -4,10 +4,10 @@
 
 Esse repósitório visa estudar algumas ferramentas de análise de dados se utilziando dos dados abertos dos candidatos das eleições de 2024. Passando pela criação de um Data App.
 
-[Acessar Data App](https://candidaturas-br-2024.streamlit.app/)
+[Acessar Data App](https://candidaturas-br-2024.streamlit.app/)\
 [Fonte: Dados Abertos TSE](https://dadosabertos.tse.jus.br/dataset/candidatos-2024)
 
-Realizado com material de apoio das Lives do Téo me Why.
+Realizado com material de apoio das Lives do Téo me Why.\
 [Link das Lives](https://www.twitch.tv/collections/hPL8gBlV7xc2BA)
 
 #### Aqui utilizo:
