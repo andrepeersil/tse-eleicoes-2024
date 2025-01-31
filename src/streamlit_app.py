@@ -12,7 +12,7 @@ import seaborn as sns
 from adjustText import adjust_text
 #%%
 from sklearn.cluster import KMeans
-os.getcwd()
+st.title(os.getcwd())
 # #%%
 
 # # current_dir = os.path.dirname(__file__)
