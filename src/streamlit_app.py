@@ -25,7 +25,7 @@ ufs = df[['SG_UF']].drop_duplicates()
 cargos = df[['DS_CARGO']].drop_duplicates()
 
 st.title('TSE Analytics')
-# st.write(cargos['DS_CARGO'].to_list())
+
 def about():
 
     st.markdown('''Esse repósitório visa estudar 
