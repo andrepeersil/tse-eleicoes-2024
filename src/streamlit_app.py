@@ -23,7 +23,6 @@ df = carregar_dados()
 
 ufs = df[['SG_UF']].drop_duplicates()
 cargos = df[['DS_CARGO']].drop_duplicates()
-cargos.loc[3] = 'TODOS'
 
 st.title('TSE Analytics')
 # st.write(cargos['DS_CARGO'].to_list())
@@ -38,8 +37,6 @@ def about():
     st.markdown('[Dados Abertos TSE](https://dadosabertos.tse.jus.br/dataset/candidatos-2024)')
     st.markdown('[Repositório GitHub](https://github.com/andrepeersil/tse-eleicoes-2024)')
 
-    st.markdown('Realizado com material de apoio das Lives do Téo me Why.')
-    st.markdown('[Link das Lives](https://www.twitch.tv/collections/hPL8gBlV7xc2BA)')
 
 with st.sidebar:
     uf = st.selectbox(
@@ -65,11 +62,7 @@ with st.sidebar:
 with st.sidebar:
     about()
 
-if cargo == 'TODOS':
-    df_select = df[(df['SG_UF']==uf) & (df['DS_CARGO'].isin(cargos['DS_CARGO'].to_list()))]
-else:
-    df_select = df[(df['SG_UF']==uf) & (df['DS_CARGO']==cargo)]
-
+df_select = df[(df['SG_UF']==uf) & (df['DS_CARGO']==cargo)]
 
 st.write(f"Total candidatos: {df_select['totalcandidatos'].sum()}")
 

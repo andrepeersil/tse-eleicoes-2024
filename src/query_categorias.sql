@@ -2,6 +2,7 @@
 with tb_genero as (
     
     select SG_PARTIDO,
+        DS_OCUPACAO,
         SG_UF,
         SQ_CANDIDATO,
         DS_GENERO,
@@ -37,20 +38,10 @@ select SQ_CANDIDATO,
 from tb_candidaturas
 ),
 
--- tb_cargos as (
--- select SQ_CANDIDATO,
---     SG_UF,
---     SG_PARTIDO,
---     DS_CARGO,
---     case when DS_CARGO = 'VEREADOR' then 1 else 0 end as cargo_VEREADOR,
---     case when DS_CARGO = 'VICE-PREFEITO' then 1 else 0 end as cargo_VICE,
---     case when DS_CARGO = 'PREFEITO' then 1 else 0 end as cargo_PREFEITO
-
--- from tb_candidaturas
--- ),
 
 tb_cor_genero as (
     select t1.SQ_CANDIDATO,
+            t1.DS_OCUPACAO,
             t1.SG_PARTIDO,
             t1.DS_CARGO,
             t1.SG_UF,
@@ -87,8 +78,7 @@ tb_taxas as(
 ),
 
 tb_taxas_br as (
-    select 'BR' as SG_UF,
-        SG_PARTIDO,
+    select SG_PARTIDO,
         DS_CARGO,
         count(*) totalcandidatos,
 
@@ -99,16 +89,57 @@ tb_taxas_br as (
         sum(cor_PRETA) / (1.0 * count(*)) as txPretos
     
 from tb_cor_genero
-group by SG_UF, SG_PARTIDO, DS_CARGO
+group by SG_PARTIDO, DS_CARGO
 ),
+
+tb_taxas_br_uf as (select 'BR' as SG_UF,
+    *
+from tb_taxas_br),
+
+tb_cargos_br as (select SG_UF,
+    SG_PARTIDO,
+    'TODOS' as DS_CARGO,
+
+    sum(totalcandidatos) as totalcandidatos,
+
+    sum(totalfem) as totalfem,
+    sum(totalfem) / (1.0*sum(totalcandidatos)) as txfem,
+
+    sum(totalPretos) as totalPretos,
+    sum(totalPretos) / (1.0* sum(totalcandidatos)) as txPretos
+
+from tb_taxas_br_uf 
+group by SG_PARTIDO),
+
+-- tb_cargos_br_todos as (select 'TODOS' as DS_CARGO, *
+-- from tb_cargos_br),
+
+tb_taxas_tds_cargos_uf as (select SG_UF,
+     SG_PARTIDO,
+    'TODOS' as DS_CARGO,
+
+    count(*) totalcandidatos,
+
+    sum(fem) as totalfem,
+    sum(fem) / (1.0 * count(*)) as txfem,
+
+    sum(cor_PRETA) as totalPretos,
+    sum(cor_PRETA) / (1.0 * count(*)) as txPretos
+    
+from tb_cor_genero
+group by SG_UF, SG_PARTIDO),
 
 tb_taxas_geral as (
 
     select * from tb_taxas
     union ALL
-    select * from tb_taxas_br
+    select * from tb_taxas_br_uf
+    union ALL
+    select * from tb_cargos_br
+    union ALL
+    select * from tb_taxas_tds_cargos_uf
 )
 
 select * 
-from tb_taxas_geral 
-where SG_UF = 'BR'
+from tb_taxas_geral
+order by SG_UF, SG_PARTIDO, DS_CARGO
