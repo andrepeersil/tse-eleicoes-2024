@@ -17,12 +17,16 @@ df.shape
 #%%
 
 df.to_csv('../data/query_categorias.csv')
-df.to_parquet('../data/query_categorias.parquet')
+df.to_parquet('../data/query_categorias_v2.parquet')
 file_size_csv = os.path.getsize('../data/query_categorias.csv')
-file_size_parquet = os.path.getsize('../data/query_categorias.parquet')
+file_size_parquet = os.path.getsize('../data/query_categorias_v2.parquet')
 #%%
 
 print(f"file size csv: {file_size_csv}")
 print(f"file size parquet: {file_size_parquet}")
 
 
+#%%
+df.head()
+
+#%%

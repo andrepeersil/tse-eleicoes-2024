@@ -1,32 +1,17 @@
 
 with tb_genero as (
     
-    select SG_PARTIDO,
-        DS_OCUPACAO,
-        SG_UF,
-        SQ_CANDIDATO,
-        DS_GENERO,
+    select SQ_CANDIDATO,
+        SG_PARTIDO,
         DS_CARGO,
+        SG_UF,
+        case when DS_GENERO = 'MASCULINO' then 1 else 0 end as masc,
+        case when DS_GENERO = 'FEMININO' then 1 else 0 end as fem
 
-    case
-        when DS_GENERO = 'MASCULINO' then 1
-        else 0
-    end as masc,
-
-    case
-        when DS_GENERO = 'FEMININO' then 1
-        else 0
-    end as fem
-
-    from tb_candidaturas
-
-),
+    from tb_candidaturas),
 
 tb_cor_candidato as (
-select SQ_CANDIDATO,
-    SG_UF,
-    SG_PARTIDO,
-    DS_CARGO,
+    select SQ_CANDIDATO,
     case when DS_COR_RACA = 'BRANCA' then 1 else 0 end as cor_BRANCA,
     case when DS_COR_RACA = 'PARDA' then 1 else 0 end as cor_PARDA,
     case when DS_COR_RACA = 'PRETA' then 1 else 0 end as cor_PRETA,
@@ -39,9 +24,42 @@ from tb_candidaturas
 ),
 
 
-tb_cor_genero as (
+tb_cassados as (
+    select SQ_CANDIDATO,
+    1 as cassado
+
+    from tb_cassacao
+),
+
+
+tb_educacao as (select SQ_CANDIDATO,
+    case when DS_GRAU_INSTRUCAO = 'ENSINO MÉDIO COMPLETO' then 1 else 0 end as EDUC_MEDIO,
+    case when DS_GRAU_INSTRUCAO = 'SUPERIOR COMPLETO' then 1 else 0 end as EDUC_SUPERIOR,
+    case when DS_GRAU_INSTRUCAO = 'ENSINO FUNDAMENTAL COMPLETO' then 1 else 0 end as EDUC_FUNDAMENTAL
+
+from tb_candidaturas
+),
+
+
+tb_estado_civil as (select SQ_CANDIDATO,
+    case when DS_ESTADO_CIVIL = 'SOLTEIRO(A)' then 1 else 0 end as SOLTEIRO,
+    case when DS_ESTADO_CIVIL = 'CASADO(A)' then 1 else 0 end as CASADO,
+    case when DS_ESTADO_CIVIL = 'DIVORCIADO(A)' then 1 else 0 end as DIVORCIADO
+
+from tb_candidaturas
+),
+
+
+tb_idades as (
+    select SQ_CANDIDATO,
+    2025 - cast(substr(DT_NASCIMENTO, -4) as  INT) as idade
+
+    from tb_candidaturas
+),
+
+
+tb_merge as (
     select t1.SQ_CANDIDATO,
-            t1.DS_OCUPACAO,
             t1.SG_PARTIDO,
             t1.DS_CARGO,
             t1.SG_UF,
@@ -53,93 +71,260 @@ tb_cor_genero as (
             t2.cor_NAO_INFORMADO,
             t2.cor_INDÍGENA,
             t2.cor_AMARELA,
-            t2.cor_DIVULGAVEL
+            t2.cor_DIVULGAVEL,
+            coalesce(t3.cassado, 0) as cassado,
+            t4.EDUC_MEDIO,
+            t4.EDUC_SUPERIOR,
+            t4.EDUC_FUNDAMENTAL,
+            t5.SOLTEIRO,
+            t5.CASADO,
+            t5.DIVORCIADO,
+            t6.idade
+
 
     from tb_genero as t1
 
     left join tb_cor_candidato as t2
     on t1.SQ_CANDIDATO = t2.SQ_CANDIDATO
+
+    left join tb_cassados as t3
+    on t1.SQ_CANDIDATO = t3.SQ_CANDIDATO
+
+    left join tb_educacao as t4
+    on t1.SQ_CANDIDATO = t4.SQ_CANDIDATO
+
+    left join tb_estado_civil as t5
+    on t1.SQ_CANDIDATO = t5.SQ_CANDIDATO
+
+    left join tb_idades as t6
+    on t1.SQ_CANDIDATO = t6.SQ_CANDIDATO
+
 ),
 
-tb_taxas as(
-    select SG_UF,
-        SG_PARTIDO,
-        DS_CARGO,
-        count(*) totalcandidatos,
+tb_taxas as (select SG_UF,
+    SG_PARTIDO,
+    DS_CARGO,
 
-        sum(fem) as totalfem,
-        sum(fem) / (1.0 * count(*)) as txfem,
+    count(SQ_CANDIDATO) as totalcandidatos,
 
-        sum(cor_PRETA) as totalPretos,
-        sum(cor_PRETA) / (1.0 * count(*)) as txPretos
-        
-    from tb_cor_genero
-    group by SG_UF, SG_PARTIDO, DS_CARGO
-),
+    sum(masc) as totalmasc,
+    sum(masc) / (1.0*count(SQ_CANDIDATO)) as txmasc,
 
-tb_taxas_br as (
-    select SG_PARTIDO,
-        DS_CARGO,
-        count(*) totalcandidatos,
+    sum(fem) as totalfem,
+    sum(fem) / (1.0*count(SQ_CANDIDATO)) as txfem,
 
-        sum(fem) as totalfem,
-        sum(fem) / (1.0 * count(*)) as txfem,
+    sum(cor_PRETA) as totalPRETA,
+    sum(cor_PRETA) / (1.0* count(SQ_CANDIDATO)) as txPretos,
 
-        sum(cor_PRETA) as totalPretos,
-        sum(cor_PRETA) / (1.0 * count(*)) as txPretos
-    
-from tb_cor_genero
-group by SG_PARTIDO, DS_CARGO
-),
+    sum(cor_PARDA) as totalPARDA,
+    sum(cor_PARDA) / (1.0* count(SQ_CANDIDATO)) as txtPardos,
 
-tb_taxas_br_uf as (select 'BR' as SG_UF,
-    *
-from tb_taxas_br),
+    sum(cor_BRANCA) as totalBRANCA,
+    sum(cor_BRANCA) / (1.0* count(SQ_CANDIDATO)) as txBrancos,
 
-tb_cargos_br as (select SG_UF,
+    sum(cor_INDÍGENA) as totalINDÍGENA,
+    sum(cor_INDÍGENA) / (1.0* count(SQ_CANDIDATO)) as txtIndigena,
+
+    sum(cor_AMARELA) as totalAMARELA,
+    sum(cor_AMARELA) / (1.0* count(SQ_CANDIDATO)) as txAmarelo,
+
+    sum(cassado) as totalcassado,
+    sum(cassado) / (1.0* count(SQ_CANDIDATO)) as txcassado,
+
+    sum(EDUC_MEDIO) as totaEDUC_MEDIO,
+    sum(EDUC_MEDIO) / (1.0* count(SQ_CANDIDATO)) as txEDUC_MEDIO,
+
+    sum(EDUC_SUPERIOR) as totalEDUC_SUPERIOR,
+    sum(EDUC_SUPERIOR) / (1.0* count(SQ_CANDIDATO)) as txEDUC_SUPERIOR,
+
+    sum(EDUC_FUNDAMENTAL) as totalEDUC_FUNDAMENTAL,
+    sum(EDUC_FUNDAMENTAL) / (1.0* count(SQ_CANDIDATO)) as txEDUC_FUNDAMENTAL,
+
+    sum(SOLTEIRO) as totalSOLTEIRO,
+    sum(SOLTEIRO) / (1.0* count(SQ_CANDIDATO)) as txSOLTEIRO,
+
+    sum(CASADO) as totalCASADO,
+    sum(CASADO) / (1.0* count(SQ_CANDIDATO)) as txCASADO,
+
+    sum(DIVORCIADO) as totalDIVORCIADO,
+    sum(DIVORCIADO) / (1.0* count(SQ_CANDIDATO)) as txDIVORCIADO,
+
+    avg(idade) as med_idade
+
+from tb_merge 
+group by 1,2,3),
+
+tb_taxas_br as (select 'Brasil' as SG_UF,
+    SG_PARTIDO,
+    DS_CARGO,
+
+    count(SQ_CANDIDATO) as totalcandidatos,
+
+    sum(masc) as totalmasc,
+    sum(masc) / (1.0*count(SQ_CANDIDATO)) as txmasc,
+
+    sum(fem) as totalfem,
+    sum(fem) / (1.0*count(SQ_CANDIDATO)) as txfem,
+
+    sum(cor_PRETA) as totalPRETA,
+    sum(cor_PRETA) / (1.0* count(SQ_CANDIDATO)) as txPretos,
+
+    sum(cor_PARDA) as totalPARDA,
+    sum(cor_PARDA) / (1.0* count(SQ_CANDIDATO)) as txtPardos,
+
+    sum(cor_BRANCA) as totalBRANCA,
+    sum(cor_BRANCA) / (1.0* count(SQ_CANDIDATO)) as txBrancos,
+
+    sum(cor_INDÍGENA) as totalINDÍGENA,
+    sum(cor_INDÍGENA) / (1.0* count(SQ_CANDIDATO)) as txtIndigena,
+
+    sum(cor_AMARELA) as totalAMARELA,
+    sum(cor_AMARELA) / (1.0* count(SQ_CANDIDATO)) as txAmarelo,
+
+    sum(cassado) as totalcassado,
+    sum(cassado) / (1.0* count(SQ_CANDIDATO)) as txcassado,
+
+    sum(EDUC_MEDIO) as totaEDUC_MEDIO,
+    sum(EDUC_MEDIO) / (1.0* count(SQ_CANDIDATO)) as txEDUC_MEDIO,
+
+    sum(EDUC_SUPERIOR) as totalEDUC_SUPERIOR,
+    sum(EDUC_SUPERIOR) / (1.0* count(SQ_CANDIDATO)) as txEDUC_SUPERIOR,
+
+    sum(EDUC_FUNDAMENTAL) as totalEDUC_FUNDAMENTAL,
+    sum(EDUC_FUNDAMENTAL) / (1.0* count(SQ_CANDIDATO)) as txEDUC_FUNDAMENTAL,
+
+    sum(SOLTEIRO) as totalSOLTEIRO,
+    sum(SOLTEIRO) / (1.0* count(SQ_CANDIDATO)) as txSOLTEIRO,
+
+    sum(CASADO) as totalCASADO,
+    sum(CASADO) / (1.0* count(SQ_CANDIDATO)) as txCASADO,
+
+    sum(DIVORCIADO) as totalDIVORCIADO,
+    sum(DIVORCIADO) / (1.0* count(SQ_CANDIDATO)) as txDIVORCIADO,
+
+    avg(idade) as med_idade
+
+from tb_merge 
+group by 1,2,3),
+
+tb_taxas_tds_cargos as (select SG_UF,
     SG_PARTIDO,
     'TODOS' as DS_CARGO,
 
-    sum(totalcandidatos) as totalcandidatos,
+    count(SQ_CANDIDATO) as totalcandidatos,
 
-    sum(totalfem) as totalfem,
-    sum(totalfem) / (1.0*sum(totalcandidatos)) as txfem,
-
-    sum(totalPretos) as totalPretos,
-    sum(totalPretos) / (1.0* sum(totalcandidatos)) as txPretos
-
-from tb_taxas_br_uf 
-group by SG_PARTIDO),
-
--- tb_cargos_br_todos as (select 'TODOS' as DS_CARGO, *
--- from tb_cargos_br),
-
-tb_taxas_tds_cargos_uf as (select SG_UF,
-     SG_PARTIDO,
-    'TODOS' as DS_CARGO,
-
-    count(*) totalcandidatos,
+    sum(masc) as totalmasc,
+    sum(masc) / (1.0*count(SQ_CANDIDATO)) as txmasc,
 
     sum(fem) as totalfem,
-    sum(fem) / (1.0 * count(*)) as txfem,
+    sum(fem) / (1.0*count(SQ_CANDIDATO)) as txfem,
 
-    sum(cor_PRETA) as totalPretos,
-    sum(cor_PRETA) / (1.0 * count(*)) as txPretos
-    
-from tb_cor_genero
-group by SG_UF, SG_PARTIDO),
+    sum(cor_PRETA) as totalPRETA,
+    sum(cor_PRETA) / (1.0* count(SQ_CANDIDATO)) as txPretos,
+
+    sum(cor_PARDA) as totalPARDA,
+    sum(cor_PARDA) / (1.0* count(SQ_CANDIDATO)) as txtPardos,
+
+    sum(cor_BRANCA) as totalBRANCA,
+    sum(cor_BRANCA) / (1.0* count(SQ_CANDIDATO)) as txBrancos,
+
+    sum(cor_INDÍGENA) as totalINDÍGENA,
+    sum(cor_INDÍGENA) / (1.0* count(SQ_CANDIDATO)) as txtIndigena,
+
+    sum(cor_AMARELA) as totalAMARELA,
+    sum(cor_AMARELA) / (1.0* count(SQ_CANDIDATO)) as txAmarelo,
+
+    sum(cassado) as totalcassado,
+    sum(cassado) / (1.0* count(SQ_CANDIDATO)) as txcassado,
+
+    sum(EDUC_MEDIO) as totaEDUC_MEDIO,
+    sum(EDUC_MEDIO) / (1.0* count(SQ_CANDIDATO)) as txEDUC_MEDIO,
+
+    sum(EDUC_SUPERIOR) as totalEDUC_SUPERIOR,
+    sum(EDUC_SUPERIOR) / (1.0* count(SQ_CANDIDATO)) as txEDUC_SUPERIOR,
+
+    sum(EDUC_FUNDAMENTAL) as totalEDUC_FUNDAMENTAL,
+    sum(EDUC_FUNDAMENTAL) / (1.0* count(SQ_CANDIDATO)) as txEDUC_FUNDAMENTAL,
+
+    sum(SOLTEIRO) as totalSOLTEIRO,
+    sum(SOLTEIRO) / (1.0* count(SQ_CANDIDATO)) as txSOLTEIRO,
+
+    sum(CASADO) as totalCASADO,
+    sum(CASADO) / (1.0* count(SQ_CANDIDATO)) as txCASADO,
+
+    sum(DIVORCIADO) as totalDIVORCIADO,
+    sum(DIVORCIADO) / (1.0* count(SQ_CANDIDATO)) as txDIVORCIADO,
+
+    avg(idade) as med_idade
+
+from tb_merge 
+group by 1,2,3),
+
+tb_taxas_tds_cargos_br as (select 'Brasil' as SG_UF,
+    SG_PARTIDO,
+    'TODOS' as DS_CARGO,
+
+    count(SQ_CANDIDATO) as totalcandidatos,
+
+    sum(masc) as totalmasc,
+    sum(masc) / (1.0*count(SQ_CANDIDATO)) as txmasc,
+
+    sum(fem) as totalfem,
+    sum(fem) / (1.0*count(SQ_CANDIDATO)) as txfem,
+
+    sum(cor_PRETA) as totalPRETA,
+    sum(cor_PRETA) / (1.0* count(SQ_CANDIDATO)) as txPretos,
+
+    sum(cor_PARDA) as totalPARDA,
+    sum(cor_PARDA) / (1.0* count(SQ_CANDIDATO)) as txtPardos,
+
+    sum(cor_BRANCA) as totalBRANCA,
+    sum(cor_BRANCA) / (1.0* count(SQ_CANDIDATO)) as txBrancos,
+
+    sum(cor_INDÍGENA) as totalINDÍGENA,
+    sum(cor_INDÍGENA) / (1.0* count(SQ_CANDIDATO)) as txtIndigena,
+
+    sum(cor_AMARELA) as totalAMARELA,
+    sum(cor_AMARELA) / (1.0* count(SQ_CANDIDATO)) as txAmarelo,
+
+    sum(cassado) as totalcassado,
+    sum(cassado) / (1.0* count(SQ_CANDIDATO)) as txcassado,
+
+    sum(EDUC_MEDIO) as totaEDUC_MEDIO,
+    sum(EDUC_MEDIO) / (1.0* count(SQ_CANDIDATO)) as txEDUC_MEDIO,
+
+    sum(EDUC_SUPERIOR) as totalEDUC_SUPERIOR,
+    sum(EDUC_SUPERIOR) / (1.0* count(SQ_CANDIDATO)) as txEDUC_SUPERIOR,
+
+    sum(EDUC_FUNDAMENTAL) as totalEDUC_FUNDAMENTAL,
+    sum(EDUC_FUNDAMENTAL) / (1.0* count(SQ_CANDIDATO)) as txEDUC_FUNDAMENTAL,
+
+    sum(SOLTEIRO) as totalSOLTEIRO,
+    sum(SOLTEIRO) / (1.0* count(SQ_CANDIDATO)) as txSOLTEIRO,
+
+    sum(CASADO) as totalCASADO,
+    sum(CASADO) / (1.0* count(SQ_CANDIDATO)) as txCASADO,
+
+    sum(DIVORCIADO) as totalDIVORCIADO,
+    sum(DIVORCIADO) / (1.0* count(SQ_CANDIDATO)) as txDIVORCIADO,
+
+    avg(idade) as med_idade
+
+from tb_merge 
+group by 1,2,3),
 
 tb_taxas_geral as (
 
     select * from tb_taxas
     union ALL
-    select * from tb_taxas_br_uf
+    select * from tb_taxas_br
     union ALL
-    select * from tb_cargos_br
+    select * from tb_taxas_tds_cargos
     union ALL
-    select * from tb_taxas_tds_cargos_uf
+    select * from tb_taxas_tds_cargos_br
+
 )
 
 select * 
 from tb_taxas_geral
-order by SG_UF, SG_PARTIDO, DS_CARGO
+order by 1,2,3
